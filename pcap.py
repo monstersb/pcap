@@ -6,7 +6,6 @@ class Pcap(object):
     def __init__(self, stream, log):
         self._log = log
         self._stream = stream
-        self._header = stream.read(0x1)
         self._header = stream.read(0x18)
         assert len(self._header) == 0x18, 'Invalid pcap file'
 
@@ -28,7 +27,7 @@ class Pcap(object):
         assert len(header) == 0x10, 'Incomplete pcap packet'
 
         sec, msec, cap_len, real_len = struct.unpack('IIII', header)
-        self._log('%d.%d' % (sec, msec))
+        self._log('[pcap] %04X %d.%d' % (self.link_type, sec, msec))
         
         data = self._stream.read(cap_len)
         return sec, msec, real_len, data

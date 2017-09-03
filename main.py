@@ -5,6 +5,7 @@ import argparse
 import sys
 
 from pcap import Pcap
+from ethernet import Ethernet
 
 def logger(verbose):
     def log_null(x):
@@ -31,4 +32,7 @@ if __name__ == '__main__':
         exit()
     pcap = Pcap(stream, log=logger(opt.verbose))
     while True:
-        print(pcap.read())
+        sec, msec, length, frame = pcap.read()
+        print('%d.%d Length:%d' % (sec, msec, length))
+
+        Ethernet(frame, log=logger(opt.verbose))
