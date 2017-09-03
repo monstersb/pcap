@@ -1,0 +1,2 @@
+class Pcap(object):
+    pass
