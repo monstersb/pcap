@@ -13,21 +13,21 @@ class Pcap(object):
 
         assert self.magic == 0xA1B2C3D4, 'Invalid pcap file'
 
-        self._log('pcap major version: %d' % self.ver_maj)
+        #self._log('pcap major version: %d' % self.ver_maj)
         assert self.ver_maj == 2, 'Invalid pcap version'
 
-        self._log('pcap minor version: %d' % self.ver_min)
+        #self._log('pcap minor version: %d' % self.ver_min)
         assert self.ver_min == 4, 'Invalid pcap version'
 
-        self._log('pcap snap len: %d' % self.snaplen)
-        self._log('pcap link type: %d' % self.link_type)
+        #self._log('pcap snap len: %d' % self.snaplen)
+        #self._log('pcap link type: %d' % self.link_type)
 
     def read(self):
         header = self._stream.read(0x10)
         assert len(header) == 0x10, 'Incomplete pcap packet'
 
         sec, msec, cap_len, real_len = struct.unpack('IIII', header)
-        self._log('[pcap] %04X %d.%d' % (self.link_type, sec, msec))
+        self._log('pcap', None, '%04X %d.%d' % (self.link_type, sec, msec))
         
         data = self._stream.read(cap_len)
         return sec, msec, real_len, data
