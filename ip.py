@@ -23,4 +23,4 @@ class IP(Protocol):
         self.src = self._read('4B')
         self.dst = self._read('4B')
         path = (b2ip(self.src), b2ip(self.dst))
-        log(self.deep, 'ipv%d' % self.version, path, 'Protocol:%02X TTL:%d' % (self.proto, self.ttl))
+        log(self.deep, self.protocol, path, 'Protocol:%02X TTL:%d' % (self.proto, self.ttl))
