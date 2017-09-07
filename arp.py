@@ -1,31 +1,38 @@
 import struct
 from utils import b2ip, b2mac
+from protocol import Protocol
+from log import log
 
 
-def ARP(x, log):
-    h_type, p_type, h_len, p_len = struct.unpack('>HHBB', x[:6])
-    assert h_type == 1 and h_len == 6, 'Invalid hardware type'
-    assert p_type == 0x0800 and p_len == 4, 'Invalid protocol type'
+class ARP(Protocol):
+    protocol = 'ARP'
 
-    op, = struct.unpack('>H', x[6:8])
-    if op == 1:
-        pass # arp request
-    elif op == 2:
-        pass # arp response
-    elif op == 3:
-        pass # rarp request
-    elif op == 4:
-        pass # rarp response
-    else:
-        raise Exception('Invalid arp operation: %04X' % op)
+    def parse(self):
+        self.h_type = self._read('>H')
+        self.p_type = self._read('>H')
+        self.h_length = self._read('B')
+        self.p_length = self._read('B')
+        assert self.h_type == 1 and self.h_length == 6, 'Invalid hardware type'
+        assert self.p_type == 0x0800 and self.p_length == 4, 'Invalid protocol type'
 
-    src_mac = struct.unpack('6B', x[8:14])
-    src_ip = struct.unpack('4B', x[14:18])
-    dst_mac = struct.unpack('6B', x[18:24])
-    dst_ip = struct.unpack('4B', x[24:28])
-    path = (
-        '%s %s' % (b2mac(src_mac), b2ip(src_ip)),
-        '%s %s' % (b2mac(dst_mac), b2ip(dst_ip)),
-    )
-    log('arp', path, '%04X %04X' % (h_type, p_type))
-    exit()
+        self.op = self._read('>H')
+        if self.op == 1:
+            pass # arp request
+        elif self.op == 2:
+            pass # arp response
+        elif self.op == 3:
+            pass # rarp request
+        elif self.op == 4:
+            pass # rarp response
+        else:
+            raise Exception('Invalid arp operation: %04X' % self.op)
+
+        self.src_mac = self._read('6B')
+        self.src_ip = self._read('4B')
+        self.dst_mac = self._read('6B') 
+        self.dst_ip = self._read('4B')
+        path = (
+            '%s %s' % (b2mac(self.src_mac), b2ip(self.src_ip)),
+            '%s %s' % (b2mac(self.dst_mac), b2ip(self.dst_ip)),
+        )
+        log(self.deep, 'arp', path, '%04X %04X' % (self.h_type, self.p_type))

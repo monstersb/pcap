@@ -27,7 +27,7 @@ class Pcap(object):
         assert len(header) == 0x10, 'Incomplete pcap packet'
 
         sec, msec, cap_len, real_len = struct.unpack('IIII', header)
-        self._log('pcap', None, '%04X %d.%d' % (self.link_type, sec, msec))
+        #self._log(0, 'pcap', None, '%04X %d.%d' % (self.link_type, sec, msec))
         
         data = self._stream.read(cap_len)
         return sec, msec, real_len, data

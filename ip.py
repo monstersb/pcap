@@ -1,15 +1,26 @@
 import struct
 from utils import b2ip
+from protocol import Protocol
+from log import log
 
 
-def IPPacket(src, log):
-    src_ip = struct.unpack('4B', src[12:16])
-    dst_ip = struct.unpack('4B', src[16:20])
-    t, tos, length = struct.unpack('>BBH', src[:4])
-    ver = (t & 0b11110000) >> 4
-    header_length = ((t & 0b1111) >> 4) * 4
-    ser, offset = struct.unpack('>HH', src[4:8])
-    flag = offset & 0b111
-    offset = offset >> 3
-    ttl, proto, crc = struct.unpack('>BBH', src[8:12])
-    log('ipv%d' % ver, (b2ip(src_ip), b2ip(dst_ip)), 'Protocol:%02X TTL:%d' % (proto, ttl))
+class IP(Protocol):
+    protocol = 'IP'
+
+    def parse(self):
+        t = self._read('B')
+        self.version = (t & 0b11110000) >> 4
+        self.header_length = ((t & 0b1111) >> 4) * 4
+        self.tos = self._read('B')
+        self.length = self._read('>H')
+        self.ser = self._read('>H')
+        t = self._read('>H')
+        self.flag = t & 0b111
+        self.offset = t >> 3
+        self.ttl = self._read('B')
+        self.proto = self._read('B')
+        self.crc = self._read('>H')
+        self.src = self._read('4B')
+        self.dst = self._read('4B')
+        path = (b2ip(self.src), b2ip(self.dst))
+        log(self.deep, 'ipv%d' % self.version, path, 'Protocol:%02X TTL:%d' % (self.proto, self.ttl))

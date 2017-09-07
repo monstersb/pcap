@@ -1,7 +1,9 @@
+from protocol import Protocol
 import struct
-from ip import IPPacket
+from ip import IP
 from arp import ARP
 from utils import b2mac
+from log import log
 
 
 frame_type = {
@@ -9,13 +11,19 @@ frame_type = {
     0x0806: 'ARP',
 }
 
-def Ethernet(src, log):
-    assert len(src) >= 14, 'Invalid ethernet frame'
-    src_mac = struct.unpack('6B', src[:6])
-    dst_mac = struct.unpack('6B', src[6:12])
-    data_type, = struct.unpack('>H', src[12:14])
-    log('ethernet', (b2mac(src_mac), b2mac(dst_mac)), '%04X' % (data_type))
-    if data_type == 0x0800:
-        IPPacket(src[14:], log)
-    elif data_type == 0x0806:
-        ARP(src[14:], log)
+
+class Ethernet(Protocol):
+    protocol = 'Ethernet'
+
+    def parse(self):
+        assert len(self._data) >= 14, 'invalid ethernet frame'
+        self.src = self._read('6B')
+        self.dst = self._read('6B')
+        data_type = self._read('>H')
+        log(self.deep, self.protocol, (b2mac(self.src), b2mac(self.dst)), '%04X' % (data_type))
+        if data_type == 0x0800:
+            ip = IP(self, self._data[14:])
+            ip.parse()
+        elif data_type == 0x0806:
+            arp = ARP(self, self._data[14:])
+            arp.parse()

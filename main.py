@@ -15,10 +15,10 @@ def logger(verbose):
     def color(bg, x):
         return colored.fg(bg) + x + colored.attr('reset')
 
-    def log(protocol, path, data):
+    def log(deep, protocol, path, data):
         protocol = color('yellow', '[%s]' % protocol)
         path = '(%s -> %s)' % (color('cyan', path[0]), color('cyan', path[1])) if path else ''
-        print(protocol, path, data)
+        print('  ' * deep, protocol, path, data)
 
     return log if verbose else log_null
 
@@ -39,4 +39,7 @@ if __name__ == '__main__':
     pcap = Pcap(stream, log=logger(opt.verbose))
     while True:
         sec, msec, length, frame = pcap.read()
-        Ethernet(frame, log=logger(opt.verbose))
+        print('time: %d.%d' % (sec, msec))
+        ethernet = Ethernet(None, frame)
+        ethernet.parse()
+        print()
