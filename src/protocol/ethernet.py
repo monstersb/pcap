@@ -21,11 +21,11 @@ class Ethernet(Protocol):
         self.data_type = self._read('>H')
 
         if frame_type[self.data_type] == 'IP':
-            ip = IP(self, self._data[14:])
+            ip = IP(self, self._data[self._pos:])
             ip.parse()
             self.child.append(ip)
         elif frame_type[self.data_type] in ('ARP', 'RARP'):
-            arp = ARP(self, self._data[14:])
+            arp = ARP(self, self._data[self._pos:])
             arp.parse()
             self.child.append(arp)
         else:

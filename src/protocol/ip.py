@@ -1,5 +1,12 @@
 from .protocol import Protocol
-from utils import b2ip, color
+from .icmp import ICMP
+from utils import b2ip, color, btable
+
+ip_protocol = btable({
+    0x01: 'ICMP',
+    0x06: 'TCP',
+    0x11: 'UDP'
+})
 
 
 class IP(Protocol):
@@ -8,7 +15,7 @@ class IP(Protocol):
     def parse(self):
         t = self._read('B')
         self.version = (t & 0b11110000) >> 4
-        self.header_length = ((t & 0b1111) >> 4) * 4
+        self.header_length = (t & 0b1111) * 4
         self.tos = self._read('B')
         self.length = self._read('>H')
         self.identification = self._read('>H')
@@ -18,9 +25,18 @@ class IP(Protocol):
         self.frament_offset = t >> 3
         self.ttl = self._read('B')
         self.proto = self._read('B')
+        assert self.proto in ip_protocol, 'Unrecongnized IP type %02X' % self.proto
         self.crc = self._read('>H')
         self.src = self._read('4B')
         self.dst = self._read('4B')
+        self.option = self._read('%dB' % (self.header_length - 20))
+
+        if ip_protocol[self.proto] == 'ICMP':
+            icmp = ICMP(self, self._data[self._pos:])
+            icmp.parse()
+            self.child.append(icmp)
+        else:
+            pass
 
     @property
     def src(self, raw=False):

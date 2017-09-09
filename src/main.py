@@ -24,9 +24,9 @@ if __name__ == '__main__':
     pcap = Pcap(stream)
     while True:
         sec, msec, length, frame = pcap.read()
-        print('time: %d.%d' % (sec, msec))
         ethernet = Ethernet(None, frame)
         ethernet.parse()
         if opt.verbose:
+            print('time: %d.%d' % (sec, msec))
             ethernet.verbose()
             print()
