@@ -1,7 +1,5 @@
-import struct
-from utils import b2ip, b2mac
-from protocol import Protocol
-from log import log
+from .protocol import Protocol
+from utils import b2ip, b2mac, color
 
 
 class ARP(Protocol):
@@ -31,8 +29,12 @@ class ARP(Protocol):
         self.src_ip = self._read('4B')
         self.dst_mac = self._read('6B') 
         self.dst_ip = self._read('4B')
-        path = (
-            '%s %s' % (b2mac(self.src_mac), b2ip(self.src_ip)),
-            '%s %s' % (b2mac(self.dst_mac), b2ip(self.dst_ip)),
+
+    def __str__(self):
+        return '[%s] [%s -> %s] [%s -> %s]' % (
+            color(self.protocol, 'cyan'),
+            color(b2mac(self.src_mac), 'yellow'),
+            color(b2mac(self.dst_mac), 'yellow'),
+            color(b2ip(self.src_ip), 'yellow'),
+            color(b2ip(self.dst_ip), 'yellow')
         )
-        log(self.deep, 'arp', path, '%04X %04X' % (self.h_type, self.p_type))

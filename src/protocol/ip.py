@@ -1,7 +1,5 @@
-import struct
-from utils import b2ip
-from protocol import Protocol
-from log import log
+from .protocol import Protocol
+from utils import b2ip, color
 
 
 class IP(Protocol):
@@ -22,5 +20,10 @@ class IP(Protocol):
         self.crc = self._read('>H')
         self.src = self._read('4B')
         self.dst = self._read('4B')
-        path = (b2ip(self.src), b2ip(self.dst))
-        log(self.deep, self.protocol, path, 'Protocol:%02X TTL:%d' % (self.proto, self.ttl))
+
+    def __str__(self):
+        return '[%s] [%s -> %s]' % (
+            color(self.protocol, 'cyan'),
+            color(b2ip(self.src), 'yellow'),
+            color(b2ip(self.dst), 'yellow'),
+        )

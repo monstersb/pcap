@@ -3,8 +3,7 @@ import struct
 
 class Pcap(object):
 
-    def __init__(self, stream, log):
-        self._log = log
+    def __init__(self, stream):
         self._stream = stream
         self._header = stream.read(0x18)
         assert len(self._header) == 0x18, 'Invalid pcap file'

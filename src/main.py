@@ -3,25 +3,9 @@
 
 import argparse
 import sys
-import colored
 
 from pcap import Pcap
-from ethernet import Ethernet
-
-def logger(verbose):
-    def log_null(*args):
-        pass
-
-    def color(bg, x):
-        return colored.fg(bg) + x + colored.attr('reset')
-
-    def log(deep, protocol, path, data):
-        protocol = color('yellow', '[%s]' % protocol)
-        path = '(%s -> %s)' % (color('cyan', path[0]), color('cyan', path[1])) if path else ''
-        print('  ' * deep, protocol, path, data)
-
-    return log if verbose else log_null
-
+from protocol.ethernet import Ethernet
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -36,10 +20,13 @@ if __name__ == '__main__':
         stream = open(opt.file, 'rb')
     else:
         exit()
-    pcap = Pcap(stream, log=logger(opt.verbose))
+
+    pcap = Pcap(stream)
     while True:
         sec, msec, length, frame = pcap.read()
         print('time: %d.%d' % (sec, msec))
         ethernet = Ethernet(None, frame)
         ethernet.parse()
-        print()
+        if opt.verbose:
+            ethernet.verbose()
+            print()

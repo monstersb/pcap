@@ -1,3 +1,6 @@
+import colored
+
+
 def b2mac(x):
     return ':'.join(['%02X' % i for i in x])
 
@@ -13,3 +16,7 @@ class btable(object):
     
     def __getitem__(self, k):
         return self.data[k]
+
+
+def color(x, bg):
+    return colored.fg(bg) + x + colored.attr('reset')

@@ -5,6 +5,7 @@ class Protocol(object):
     def __init__(self, parrent, data):
         self._pos = 0
         self.parrent = parrent
+        self.child = []
         self._data = data
 
     def parse(self):
@@ -31,5 +32,8 @@ class Protocol(object):
         return '[%s]' % (self.protocol)
 
 
-    def verbose(self):
-        return
+    def verbose(self, deep=0):
+        indent = '  ' * deep
+        print(indent + str(self))
+        for child in self.child:
+            child.verbose(deep + 1)

@@ -1,9 +1,7 @@
-from protocol import Protocol
-import struct
-from ip import IP
-from arp import ARP
-from utils import b2mac, btable
-from log import log
+from .protocol import Protocol
+from .ip import IP
+from .arp import ARP
+from utils import b2mac, btable, color
 
 
 frame_type = btable({
@@ -20,12 +18,21 @@ class Ethernet(Protocol):
         self.src = self._read('6B')
         self.dst = self._read('6B')
         self.data_type = self._read('>H')
-        log(self.deep, self.protocol, (b2mac(self.src), b2mac(self.dst)))
+
         if frame_type[self.data_type] == 'IP':
             ip = IP(self, self._data[14:])
             ip.parse()
+            self.child.append(ip)
         elif frame_type[self.data_type] == 'ARP':
             arp = ARP(self, self._data[14:])
             arp.parse()
+            self.child.append(arp)
         else:
             raise Exception('Unrecognize frame type %04X' % self.data_type)
+
+    def __str__(self):
+        return '[%s] [%s -> %s]' % (
+                color(self.protocol, 'cyan'), 
+                color(b2mac(self.src), 'yellow'),
+                color(b2mac(self.dst), 'yellow')
+        )
