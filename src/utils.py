@@ -17,6 +17,9 @@ class btable(object):
     def __getitem__(self, k):
         return self.data[k]
 
+    def __contains__(self, k):
+        return k in self.data
+
 
 def color(x, bg):
-    return colored.fg(bg) + x + colored.attr('reset')
+    return colored.fg(bg) + str(x) + colored.attr('reset')

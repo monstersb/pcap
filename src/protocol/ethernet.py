@@ -7,6 +7,7 @@ from utils import b2mac, btable, color
 frame_type = btable({
     0x0800: 'IP',
     0x0806: 'ARP',
+    0x0835: 'RARP',
 })
 
 
@@ -23,7 +24,7 @@ class Ethernet(Protocol):
             ip = IP(self, self._data[14:])
             ip.parse()
             self.child.append(ip)
-        elif frame_type[self.data_type] == 'ARP':
+        elif frame_type[self.data_type] in ('ARP', 'RARP'):
             arp = ARP(self, self._data[14:])
             arp.parse()
             self.child.append(arp)
