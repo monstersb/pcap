@@ -20,9 +20,9 @@ class IP(Protocol):
         self.length = self._read('>H')
         self.identification = self._read('>H')
         t = self._read('>H')
-        self.allow_fragment = not (t & 0b010)
-        self.more_fragment = bool(t & 0b001)
-        self.frament_offset = t >> 3
+        self.allow_fragment = not (t & 0x40)
+        self.more_fragment = bool(t & 0x20)
+        self.frament_offset = t & 0x1F
         self.ttl = self._read('B')
         self.proto = self._read('B')
         assert self.proto in ip_protocol, 'Unrecongnized IP type %02X' % self.proto
