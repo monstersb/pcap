@@ -66,7 +66,7 @@ class ARP(Protocol):
         if arp_op[self.op] == 'ARP Request':
             action = 'Who has %s' % color(self.src_ip, 'blue')
         elif arp_op[self.op] == 'ARP Response':
-            action = '%s is %s' % (color(self.src_ip, 'blue'), color(self.src_mac, 'blue'))
+            action = '%s is at %s' % (color(self.src_ip, 'blue'), color(self.src_mac, 'blue'))
         else:
             action = ''
         return '[%s] (%s) from:[%s %s] %s' % (
