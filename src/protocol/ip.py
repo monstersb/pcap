@@ -1,4 +1,5 @@
 from .protocol import Protocol
+from .udp import UDP
 from .icmp import ICMP
 from utils import b2ip, color, btable
 
@@ -35,6 +36,10 @@ class IP(Protocol):
             icmp = ICMP(self, self._data[self._pos:])
             icmp.parse()
             self.child.append(icmp)
+        elif ip_protocol[self.proto] == 'UDP':
+            udp = UDP(self, self._data[self._pos:])
+            udp.parse()
+            self.child.append(udp)
         else:
             pass
 
